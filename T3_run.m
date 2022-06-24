@@ -1,11 +1,11 @@
 %% Preparación, Preguntas 1 2 3
 obj = T3_obj('docvis.xlsx');
-
+%% Profile on
 %% Pregunta 4
 beta_est_NewtonR = obj.MetNum("NR",100,[0 0 0 0 0],obj.regresores,obj.Y);
 %% Pregunta 5
 beta_est = obj.MetNum("BHHH",1000,[0 0 0 0 0],obj.regresores,obj.Y);
-
+%% Profile Viewer
 %% Pregunta 6
 beta_est_rest = obj.NR_R(100,obj.Y,0);
 
