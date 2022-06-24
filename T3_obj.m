@@ -10,16 +10,15 @@ classdef T3_obj
     
     methods
         function obj = T3_obj(xlsx)
-            %UNTITLED Construct an instance of this class
-            %   Detailed explanation goes here
+
             df =  xlsread(xlsx);
             %obtenemos las variables relevantes
             obj.base = [df(:,2) df(:,27) df(:,28) df(:,5) df(:,4)];
-            %revisi�n de missing values
+            %revisiom de missing values
             assert(sum(isnan(obj.base),'all') == 0)
-            %asignaci�n de variable dependiente del modelo
+            %asignaciom de variable dependiente del modelo
             obj.Y = obj.base(:,1);
-            %asignaci�n de constante y regresores del modelo
+            %asignacion de constante y regresores del modelo
             obj.regresores = [ones(size(obj.base,1),1) obj.base(:,2:end)];
             
             
@@ -64,7 +63,7 @@ classdef T3_obj
                     if sum(abs(beta_t1-beta_t)<1e-12)
                         beta_est = beta_t1;
                         fprintf("Convergencia en %d iteraciones \n",ii)
-                        fprintf("Resultado Iteraci�n [");
+                        fprintf("Resultado Iteracion [");
                         fprintf("%g, ", beta_t1(1:end-1));
                         fprintf("%g]\n",beta_t1(end));
                         return
@@ -82,7 +81,7 @@ classdef T3_obj
                     if sum(abs(beta_t1-beta_t)<1e-8)
                         beta_est = beta_t1;
                         fprintf("Convergencia en %d iteraciones \n",ii)
-                        fprintf("Resultado Iteraci�n [");
+                        fprintf("Resultado Iteracion [");
                         fprintf("%g, ", beta_t1(1:end-1));
                         fprintf("%g]\n",beta_t1(end));
                         return
@@ -98,6 +97,28 @@ classdef T3_obj
                 error("Not numerical Method provided")
             end
 
+        end
+        
+        function b_0 = NR_R(obj,iter,y,beta)
+           beta_t = beta;
+           for ii = 1:iter
+              prim_derivada = mean(y)-exp(beta_t);
+              seg_derivada = -exp(beta_t);
+              beta_t1 = beta_t + prim_derivada/ ((-1)*seg_derivada);
+              if abs(beta_t1-beta_t)<1e-8
+                b_0 = beta_t1;
+                fprintf("Convergencia en %d iteraciones \n",ii)
+                fprintf("Resultado Iteracion [");
+                fprintf("%g, ", beta_t1(1:end-1));
+                fprintf("%g]\n",beta_t1(end));
+                return
+
+              else
+                 beta_t = beta_t1;
+
+
+              end
+           end
         end
         
         
