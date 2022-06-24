@@ -1,7 +1,5 @@
 classdef T3_obj
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
-    
+
     properties
         base
         Y
@@ -29,7 +27,7 @@ classdef T3_obj
             mu = exp(x*beta);
         end
         function log_likelihood = log_likelihood(obj,x,y,beta)
-            log_likelihood = sum(obj.mu_i(x,beta) + y * (x.*beta) - ln(factorial(y)));
+            log_likelihood = sum(y .*(x*beta) -obj.mu_i(x,beta) - log(factorial(y)));
             
             
         end
@@ -121,6 +119,30 @@ classdef T3_obj
            end
         end
         
+        function wald_st = TestWald(obj,x,y,beta_NewtonRaphson)
+            h_est = beta_NewtonRaphson(2:5);
+            h_derivadas = ones(1,4);
+            reg_sin_cte = x(:,2:5);
+            hessiano_sin_cte = obj.hessiano(reg_sin_cte,h_est);
+            wald_st = (-1) * h_est'/(h_derivadas / hessiano_sin_cte * h_derivadas')*h_est;
+           
+        end
+        function lm_st =MultLag(obj,x,y,beta_MV_Rest)
+            vector_beta_restring  = zeros(5,1);
+            vector_beta_restring(1,1)=beta_MV_Rest;
+            gradiente_T_LM = obj.gradiente(x,y,vector_beta_restring);
+
+
+            hessiano_T_LM = obj.hessiano(x,vector_beta_restring);
+            
+            lm_st = (-1)*(gradiente_T_LM)' / hessiano_T_LM*gradiente_T_LM;
+        end
+        function lkrat_st =Lratio(obj,x,y,beta_est_NewtonR,beta_est_rest)
+            beta_est_rest = [beta_est_rest 0 0 0 0]';
+            likelihood_sin_rest = obj.log_likelihood(x,y,beta_est_NewtonR);
+            likelihood_con_rest = obj.log_likelihood(x,y,beta_est_rest);
+            lkrat_st = 2*(likelihood_sin_rest - likelihood_con_rest);
+        end
         
             
     end
