@@ -1,5 +1,9 @@
 classdef T3_obj
-
+    %Objeto desarrollado para la resolución de la Tarea. Contiene métodos
+    %necesarios para realizar los cálculos solicitados.
+    %Para ejecutar el objeto, asegurarse de tener la tabla de datos
+    %entregada en formato .xlsx, y posteriormente ejecutar T3_run.m desde
+    %la consola de comandos.
     properties
         base
         Y
@@ -23,24 +27,28 @@ classdef T3_obj
         end
         
         function mu = mu_i(obj,x,beta)
-
+            % Método de Utilidad para posteriores calculos
             mu = exp(x*beta);
         end
         function log_likelihood = log_likelihood(obj,x,y,beta)
+            % Método de Utilidad para posteriores calculos
             log_likelihood = sum(y .*(x*beta) -obj.mu_i(x,beta) - log(factorial(y)));
             
             
         end
         
         function gradiente = gradiente(obj,x,y,beta)
+            % Método de Utilidad para posteriores calculos y pregunta 3
            gradiente = x'*(y-obj.mu_i(x,beta));
-           %gradiente = sum(diag(y-obj.mu_i(x,beta)) * x,1)'; 
+
         end
         
         function hessiano = hessiano(obj,x,beta)
+            % Método de Utilidad para posteriores calculos y pregunta 3
             hessiano = (-1)* x'*diag(obj.mu_i(x,beta))*x ;
         end
         function varscore = varscore(obj,x,y,beta)
+            % Método de Utilidad para posteriores calculos 
             x=x';
             input_score = @(x,y,beta) (y-exp(x'*beta))*x;
             varscore = zeros(5,5);
@@ -53,6 +61,8 @@ classdef T3_obj
             
         end
         function beta_est = MetNum(obj,tipo,iter,guess,x,y)
+            %Método Principal de objetivo para implementar métodos
+            %númericos al modelo
             beta_t = guess';
             if tipo == "NR"
                 for ii=1:iter
@@ -98,6 +108,7 @@ classdef T3_obj
         end
         
         function b_0 = NR_R(obj,iter,y,beta)
+           %Pregunta 7
            beta_t = beta;
            for ii = 1:iter
               prim_derivada = mean(y)-exp(beta_t);
@@ -106,9 +117,8 @@ classdef T3_obj
               if abs(beta_t1-beta_t)<1e-8
                 b_0 = beta_t1;
                 fprintf("Convergencia en %d iteraciones \n",ii)
-                fprintf("Resultado Iteracion [");
-                fprintf("%g, ", beta_t1(1:end-1));
-                fprintf("%g]\n",beta_t1(end));
+                fprintf("Resultado Iteracion %2f",b_0);
+
                 return
 
               else
@@ -118,7 +128,7 @@ classdef T3_obj
               end
            end
         end
-        
+        % Métodos Referentes a los Test solicitados.
         function wald_st = TestWald(obj,x,y,beta_NewtonRaphson)
             h_est = beta_NewtonRaphson(2:5);
             h_derivadas = ones(1,4);
